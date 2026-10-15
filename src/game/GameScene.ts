@@ -38,7 +38,7 @@ export class GameScene extends Phaser.Scene{
   if(s.weather.condition==='Deszcz'||s.weather.condition==='Burza'){g.lineStyle(1,0xa4d9ee,.32);for(let i=0;i<100;i++){const px=(i*179+time*.13)%(WIDTH*CELL),py=(i*89+time*.37)%(HEIGHT*CELL);g.lineBetween(px,py,px-3,py+11);}}
   if(s.weather.condition==='Śnieg'){g.fillStyle(0xffffff,.8);for(let i=0;i<110;i++)g.fillCircle((i*83+time*.012)%(WIDTH*CELL),(i*173+time*.028)%(HEIGHT*CELL),1.4);}
  }
- private updateScenery(time:number){const s=this.engine.state,desired=new Set<string>();const camera=this.cameras.main.worldView;const left=Math.max(0,Math.floor(camera.x/CELL)-2),right=Math.min(WIDTH,Math.ceil(camera.right/CELL)+2),top=Math.max(0,Math.floor(camera.y/CELL)-2),bottom=Math.min(HEIGHT,Math.ceil(camera.bottom/CELL)+2);
+ private updateScenery(_time:number){const s=this.engine.state,desired=new Set<string>();const camera=this.cameras.main.worldView;const left=Math.max(0,Math.floor(camera.x/CELL)-2),right=Math.min(WIDTH,Math.ceil(camera.right/CELL)+2),top=Math.max(0,Math.floor(camera.y/CELL)-2),bottom=Math.min(HEIGHT,Math.ceil(camera.bottom/CELL)+2);
   for(let y=top;y<bottom;y++)for(let x=left;x<right;x++){const t=s.map[y][x];if(t.type!=='forest')continue;const key=x+','+y;desired.add(key);let tree=this.scenery.get(key);if(!tree){tree=this.add.image(x*CELL+12,y*CELL+8,'tree-real').setDisplaySize(35,37).setOrigin(.5,.75).setDepth(3);this.scenery.set(key,tree);}tree.rotation=Math.sin(time*.0012+x*2.7+y)*.012*(1+s.weather.wind*.05);tree.setTint(t.burning?0xff824c:0xffffff);}
   for(const [key,tree] of this.scenery)if(!desired.has(key)){tree.destroy();this.scenery.delete(key);}
  }
@@ -49,7 +49,7 @@ export class GameScene extends Phaser.Scene{
  private updateAnimals(_time: number){const animals=this.settings.mode==='editor'?[]:this.engine.state.animals,ids=new Set<number>();for(const a of animals){ids.add(a.id);let sp=this.beasts.get(a.id);const kind=a.kind==='cat'?'cat':'dog';if(!sp){sp=this.add.sprite(0,0,kind).setScale(.8).setDepth(7);this.beasts.set(a.id,sp);}if(a.x!==a.lastX||a.y!==a.lastY){sp.play(kind+'-walk',true);sp.setFlipX(a.x<a.lastX);}else{sp.stop();sp.setFrame(0);}const tx=a.x*CELL+12,ty=a.y*CELL+11;if(!sp.getData('initialized')){sp.setPosition(tx,ty);sp.setData('initialized',true);}sp.x=Phaser.Math.Linear(sp.x,tx,.13);sp.y=Phaser.Math.Linear(sp.y,ty,.13);sp.setTint(a.kind==='wolf'?0x777b8c:a.kind==='deer'?0xc2a475:0xffffff);}
   for(const [id,sp] of this.beasts)if(!ids.has(id)){sp.destroy();this.beasts.delete(id);}
  }
- update(time:number){if(time-this.lastRender<35)return;this.lastRender=time;this.backgrounds(time);this.updateScenery(time);this.updateBuildings();this.updatePeople(time);this.updateAnimals(time);if(this.selected!==null){const a=this.engine.agent(this.selected);if(a){this.g.lineStyle(2,0xffee96);this.g.strokeCircle(a.x*CELL+12,a.y*CELL+12,13);}}
+ update(time:number){if(_time-this.lastRender<35)return;this.lastRender=time;this.backgrounds(time);this.updateScenery(time);this.updateBuildings();this.updatePeople(time);this.updateAnimals(time);if(this.selected!==null){const a=this.engine.agent(this.selected);if(a){this.g.lineStyle(2,0xffee96);this.g.strokeCircle(a.x*CELL+12,a.y*CELL+12,13);}}
   if(this.settings.mode==='editor'){const p=this.input.activePointer,x=Math.floor(p.worldX/CELL),y=Math.floor(p.worldY/CELL);if(x>=0&&x<WIDTH&&y>=0&&y<HEIGHT){this.g.lineStyle(2,0xffffff,.75);this.g.strokeCircle(x*CELL+12,y*CELL+12,this.settings.size*CELL);}}
  }
 }
